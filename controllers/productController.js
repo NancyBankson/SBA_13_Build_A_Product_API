@@ -57,11 +57,25 @@ async function queryProduct(req, res) {
         if (!queryObj.maxPrice) {
             queryObj.maxPrice = 100000;
         }
-        console.log(queryObj.category);
+        if (!queryObj.sortBy) {
+            queryObj.sortBy = "price_asc";
+        }
+        if (!queryObj.page) {
+            queryObj.page = 1;
+        }
+        if (!queryObj.limit) {
+            queryObj.limit = 10;
+        }
+        const page = queryObj.page;
+        const limit = queryObj.limit;
+        const sortBy = String(queryObj.sortBy || "").trim();  // For sort comparison to work
         const foundBooks = await Product.find({
             category: queryObj.category,
             price: { $gte: queryObj.minPrice, $lte: queryObj.maxPrice }
         })
+            .sort({ price: (sortBy === "price_desc") ? -1 : 1 })
+            .skip((page - 1) * limit)
+            .limit(limit)
         if (foundBooks) {
             res.json(foundBooks);
         } else {
