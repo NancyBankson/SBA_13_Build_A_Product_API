@@ -25,7 +25,7 @@ async function createNewProduct(req, res) {
 
 async function updateProduct(req, res) {
     try {
-        const editedProduct = await Product.findByIdAndUpdate(req.params.id, req.body, {new: true});
+        const editedProduct = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
         res.json(editedProduct);
     } catch (error) {
         console.error("Error editing product:", error);
@@ -45,6 +45,30 @@ async function deleteProduct(req, res) {
     } catch (error) {
         console.error("Error deleting product:", error);
         res.status(400).json({ error: "Failed to delete product.", details: error.message });
+    }
+}
+
+async function queryProduct(req, res) {
+    try {
+        const queryObj = { ...req.query };
+        if (!queryObj.minPrice) {
+            queryObj.minPrice = 0;
+        }
+        if (!queryObj.maxPrice) {
+            queryObj.maxPrice = 100000;
+        }
+        console.log(queryObj.category);
+        const foundBooks = await Product.find({
+            category: queryObj.category,
+            price: { $gte: queryObj.minPrice, $lte: queryObj.maxPrice }
+        })
+        if (foundBooks) {
+            res.json(foundBooks);
+        } else {
+            res.status(400).json({ error: "Product list not found." })
+        }
+    } catch (error) {
+        res.status(400).json({ error: "Error getting product list." })
     }
 }
 
