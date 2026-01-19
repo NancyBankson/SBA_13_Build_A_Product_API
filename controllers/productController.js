@@ -6,7 +6,7 @@ async function getSingleProduct(req, res) {
         if (foundProduct) {
             res.json(foundProduct);
         } else {
-            res.status(400).json({ error: "Product not found." })
+            res.status(404).json({ error: "Product not found." })
         }
     } catch (error) {
         res.status(400).json({ error: "Invalid Id." })
@@ -26,6 +26,11 @@ async function createNewProduct(req, res) {
 async function updateProduct(req, res) {
     try {
         const editedProduct = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        if (editedProduct) {
+            res.json(editedProduct);
+        } else {
+            res.status(404).json({ error: "Product not found." })
+        }
         res.json(editedProduct);
     } catch (error) {
         console.error("Error editing product:", error);
@@ -40,6 +45,7 @@ async function deleteProduct(req, res) {
             console.log("Product deleted:", deleteProduct.title);
         } else {
             console.log("Could not find product.");
+            res.status(404).json({ error: "Product not found.", details: error.message });
         }
         res.send("Product deleted.");
     } catch (error) {
