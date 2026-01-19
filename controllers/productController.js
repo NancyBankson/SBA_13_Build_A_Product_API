@@ -70,7 +70,7 @@ async function queryProduct(req, res) {
         const limit = queryObj.limit;
         const sortBy = String(queryObj.sortBy || "").trim();  // For sort comparison to work
         const foundBooks = await Product.find({
-            category: queryObj.category,
+            ...(queryObj.category && { category: queryObj.category }),
             price: { $gte: queryObj.minPrice, $lte: queryObj.maxPrice }
         })
             .sort({ price: (sortBy === "price_desc") ? -1 : 1 })
